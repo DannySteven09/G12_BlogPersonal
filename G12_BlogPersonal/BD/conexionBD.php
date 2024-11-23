@@ -2,16 +2,15 @@
 class conexionBD {
     public static function execute($scriptSQL) {
         try {
-            // Cadena Conexión a la BD
             $conexion = mysqli_connect(
                 'localhost',
                 'root',
                 '',
-                'bd_g12_3c_blogpersonal'
+                'bd_g12_3c-blogpersonal'
             ) or die('No se puede conectar a la BD');
 
-            // Ejecución de Scripts a la BD
             $instruccionSQL = mysqli_query($conexion, $scriptSQL);
+
             $resultado = array(
                 'exito' => $instruccionSQL,
                 'error' => mysqli_error($conexion),
@@ -19,6 +18,7 @@ class conexionBD {
             );
 
             return $resultado;
+
         } catch (Exception $e) {
             echo "Error: " . $e->getMessage();
         }
@@ -28,24 +28,23 @@ class conexionBD {
         try {
             $resultado = self::execute($scriptSQL);
             $registros = array();
-    
+
             if ($resultado['exito']) {
                 while ($fila = mysqli_fetch_array($resultado['exito'], MYSQLI_ASSOC)) {
                     $registros[] = $fila;
                 }
-    
+
                 self::desconectar($resultado['conexion'], $resultado['exito']);
             }
-    
+
             return $registros;
-    
+
         } catch (Exception $e) {
             echo "Error: " . $e->getMessage();
         }
     }
-    
 
-    public static function desconectar($conexion, $resultado) {
+    static function desconectar($conexion, $resultado) {
         try {
             if ($resultado instanceof mysqli_result) {
                 mysqli_free_result($resultado);
@@ -53,6 +52,14 @@ class conexionBD {
             mysqli_close($conexion);
         } catch (Exception $e) {
             echo "Error: " . $e->getMessage();
+        }
+    }
+
+    public static function getNotificaciones($resultado, $mensaje) {
+        if ($resultado['exito']) {
+            echo '<script language="javascript">alert("' . $mensaje . '");</script>';
+        } else {
+            echo '<script language="javascript">alert("' . $resultado['error'] . '");</script>';
         }
     }
 }
